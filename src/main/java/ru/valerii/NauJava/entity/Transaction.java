@@ -8,6 +8,6 @@ import lombok.Data;
 public class Transaction {
     private Long id;
     private Double amount;
-    private String currency;
+    private Currency currency;
     private String description;
 }

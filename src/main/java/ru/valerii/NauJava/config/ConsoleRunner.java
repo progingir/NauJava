@@ -18,7 +18,7 @@ public class ConsoleRunner {
                 while (true) {
                     printHelp();
                     System.out.print("> ");
-                    String input = scanner.next().toLowerCase();
+                    String input = scanner.nextLine().trim().toLowerCase();
 
                     CommandType command = CommandType.fromString(input);
 

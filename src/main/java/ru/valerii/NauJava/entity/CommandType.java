@@ -1,5 +1,8 @@
 package ru.valerii.NauJava.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum CommandType {
     ADD("add", "добавить транзакцию"),
     LIST("list", "показать все записи"),
@@ -14,14 +17,6 @@ public enum CommandType {
     CommandType(String command, String description) {
         this.command = command;
         this.description = description;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public static CommandType fromString(String text) {

@@ -16,6 +16,13 @@ public class InMemoryTransactionRepository implements CrudRepository<Transaction
 
     @Override
     public void create(Transaction entity) {
+        Long generatedId = database.stream()
+                .mapToLong(Transaction::getId)
+                .max()
+                .orElse(0L) + 1L;
+
+        entity.setId(generatedId);
+
         database.add(entity);
     }
 
@@ -29,7 +36,7 @@ public class InMemoryTransactionRepository implements CrudRepository<Transaction
 
     @Override
     public List<Transaction> readAll() {
-        return database;
+        return List.copyOf(database);
     }
 
     @Override

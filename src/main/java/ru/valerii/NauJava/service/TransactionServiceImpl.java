@@ -22,12 +22,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void save(Double amount, String currencyCode, String description) {
         validateTransactionData(amount, currencyCode);
 
-        Long generatedId = repository.readAll().stream()
-                .mapToLong(Transaction::getId)
-                .max()
-                .orElse(0L) + 1L;
-
-        Transaction t = new Transaction(generatedId, amount, Currency.valueOf(currencyCode.toUpperCase()), description);
+        Transaction t = new Transaction(null, amount, Currency.valueOf(currencyCode.toUpperCase()), description);
         repository.create(t);
     }
 

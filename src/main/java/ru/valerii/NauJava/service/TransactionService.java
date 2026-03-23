@@ -1,16 +1,17 @@
 package ru.valerii.NauJava.service;
 
 import ru.valerii.NauJava.entity.Transaction;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransactionService {
-    void save(Double amount, String currency, String description);
+    Long save(BigDecimal amount, String currency, String description);
 
-    void update(Long id, Double amount, String currency, String description);
+    void update(Long id, BigDecimal amount, String currency, String description);
 
     List<Transaction> getAll();
 
     void remove(Long id);
 
-    Double calculateTotalAmount(String targetCurrencyCode);
+    BigDecimal calculateTotalAmount(String targetCurrencyCode);
 }

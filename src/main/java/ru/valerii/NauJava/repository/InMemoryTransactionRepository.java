@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import ru.valerii.NauJava.entity.Transaction;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class InMemoryTransactionRepository implements CrudRepository<Transaction> {
@@ -27,11 +28,10 @@ public class InMemoryTransactionRepository implements CrudRepository<Transaction
     }
 
     @Override
-    public Transaction read(Long id) {
+    public Optional<Transaction> read(Long id) {
         return database.stream()
                 .filter(t -> t.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -41,12 +41,11 @@ public class InMemoryTransactionRepository implements CrudRepository<Transaction
 
     @Override
     public void update(Transaction entity) {
-        Transaction existing = read(entity.getId());
-        if (existing != null) {
+        read(entity.getId()).ifPresent(existing -> {
             existing.setAmount(entity.getAmount());
             existing.setCurrency(entity.getCurrency());
             existing.setDescription(entity.getDescription());
-        }
+        });
     }
 
     @Override

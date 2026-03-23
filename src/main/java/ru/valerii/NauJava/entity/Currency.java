@@ -1,19 +1,23 @@
 package ru.valerii.NauJava.entity;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public enum Currency {
-    RUB(1.0),
-    USD(100.0),
-    EUR(110.0);
+    RUB(new BigDecimal("1.0")),
+    USD(new BigDecimal("100.0")),
+    EUR(new BigDecimal("110.0"));
 
-    private final double rateToBase;
+    private final BigDecimal rateToBase;
 
-    Currency(double rateToBase) {
+    Currency(BigDecimal rateToBase) {
         this.rateToBase = rateToBase;
     }
 
-    public double convertTo(Currency targetCurrency, double amount) {
-        double amountInBase = amount * this.rateToBase;
-        return amountInBase / targetCurrency.rateToBase;
+    public BigDecimal convertTo(Currency targetCurrency, BigDecimal amount) {
+        BigDecimal amountInBase = amount.multiply(this.rateToBase);
+
+        return amountInBase.divide(targetCurrency.rateToBase, 2, RoundingMode.HALF_UP);
     }
 
     public static boolean isValid(String code) {

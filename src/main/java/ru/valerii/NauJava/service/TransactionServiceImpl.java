@@ -7,6 +7,8 @@ import ru.valerii.NauJava.exception.TransactionNotFoundException;
 import ru.valerii.NauJava.exception.TransactionValidationException;
 import ru.valerii.NauJava.repository.CrudRepository;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -19,19 +21,20 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void save(Double amount, String currencyCode, String description) {
+    public Long save(BigDecimal amount, String currencyCode, String description) {
         validateTransactionData(amount, currencyCode);
 
         Transaction t = new Transaction(null, amount, Currency.valueOf(currencyCode.toUpperCase()), description);
+
         repository.create(t);
+
+        return t.getId();
     }
 
     @Override
-    public void update(Long id, Double amount, String currencyCode, String description) {
-        Transaction existing = repository.read(id);
-        if (existing == null) {
-            throw new TransactionNotFoundException("Транзакция с ID " + id + " не найдена.");
-        }
+    public void update(Long id, BigDecimal amount, String currencyCode, String description) {
+        Transaction existing = repository.read(id)
+                .orElseThrow(() -> new TransactionNotFoundException("Транзакция с ID " + id + " не найдена."));
 
         validateTransactionData(amount, currencyCode);
 
@@ -48,28 +51,28 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Double calculateTotalAmount(String targetCurrencyCode) {
+    public BigDecimal calculateTotalAmount(String targetCurrencyCode) {
         Currency targetCurrency = Currency.valueOf(targetCurrencyCode.toUpperCase());
 
         return repository.readAll().stream()
-                .mapToDouble(t -> t.getCurrency().convertTo(targetCurrency, t.getAmount()))
-                .sum();
+                .map(t -> t.getCurrency().convertTo(targetCurrency, t.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
     public void remove(Long id) {
-        if (repository.read(id) == null) {
-            throw new TransactionNotFoundException("Транзакция с ID " + id + " не найдена.");
-        }
+        repository.read(id)
+                .orElseThrow(() -> new TransactionNotFoundException("Транзакция с ID " + id + " не найдена."));
+
         repository.delete(id);
     }
 
-    private void validateTransactionData(Double amount, String currencyCode) {
-        if (amount <= 0) {
+    private void validateTransactionData(BigDecimal amount, String currencyCode) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new TransactionValidationException("Сумма транзакции должна быть больше нуля.");
         }
         if (!Currency.isValid(currencyCode)) {
-            throw new TransactionValidationException("Неверная валюта! Доступны: RUB, USD, EUR.");
+            throw new TransactionValidationException("Неверная валюта! Доступны: " + Arrays.toString(Currency.values()));
         }
     }
 }

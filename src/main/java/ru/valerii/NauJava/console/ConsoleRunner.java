@@ -1,4 +1,4 @@
-package ru.valerii.NauJava.config;
+package ru.valerii.NauJava.console;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package ru.valerii.NauJava.config;
+package ru.valerii.NauJava.console;
 
 import org.springframework.stereotype.Component;
 import ru.valerii.NauJava.entity.Currency;
@@ -6,6 +6,8 @@ import ru.valerii.NauJava.exception.TransactionNotFoundException;
 import ru.valerii.NauJava.exception.TransactionValidationException;
 import ru.valerii.NauJava.service.TransactionService;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Scanner;
 
 @Component
@@ -20,13 +22,12 @@ public class CommandProcessor {
     public void processAdd(Scanner scanner) {
         System.out.println("--- Регистрация новой транзакции ---");
         try {
-            Double amount = readDouble(scanner, "Введите сумму: ");
-            String currency = readCurrency(scanner, "Введите валюту (RUB, USD, EUR): ");
-
+            BigDecimal amount = readBigDecimal(scanner, "Введите сумму: ");
+            String currency = readCurrency(scanner, "Введите валюту " + Arrays.toString(Currency.values()) + ": ");
             String description = readString(scanner, "Введите описание: ");
 
-            service.save(amount, currency, description);
-            System.out.println(">> Транзакция успешно сохранена! Ей присвоен уникальный ID.");
+            Long id = service.save(amount, currency, description);
+            System.out.println(">> Транзакция успешно сохранена! Ей присвоен ID: " + id);
         } catch (TransactionValidationException e) {
             System.out.println(">> Ошибка валидации: " + e.getMessage());
         }
@@ -36,9 +37,8 @@ public class CommandProcessor {
         System.out.println("--- Обновление транзакции ---");
         try {
             Long id = readLong(scanner, "Введите ID существующей транзакции: ");
-            Double amount = readDouble(scanner, "Введите новую сумму: ");
-            String currency = readCurrency(scanner, "Введите новую валюту (RUB, USD, EUR): ");
-
+            BigDecimal amount = readBigDecimal(scanner, "Введите новую сумму: ");
+            String currency = readCurrency(scanner, "Введите новую валюту " + Arrays.toString(Currency.values()) + ": ");
             String description = readString(scanner, "Введите новое описание: ");
 
             service.update(id, amount, currency, description);
@@ -60,11 +60,9 @@ public class CommandProcessor {
 
     public void processTotal(Scanner scanner) {
         System.out.println("--- Подсчет общей суммы ---");
-
-        String targetCurrency = readCurrency(scanner, "В какой валюте вы хотите вывести сумму всех транзакций? (RUB, USD, EUR): ");
-
-        Double total = service.calculateTotalAmount(targetCurrency);
-        System.out.printf(">> Общая сумма всех операций: %.2f %s\n", total, targetCurrency);
+        String targetCurrency = readCurrency(scanner, "В какой валюте вывести сумму? " + Arrays.toString(Currency.values()) + ": ");
+        BigDecimal total = service.calculateTotalAmount(targetCurrency);
+        System.out.printf(">> Общая сумма всех операций: %s %s%n", total.toPlainString(), targetCurrency);
     }
 
     public void processDelete(Scanner scanner) {
@@ -77,13 +75,14 @@ public class CommandProcessor {
         }
     }
 
-    private Double readDouble(Scanner scanner, String prompt) {
+    private BigDecimal readBigDecimal(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
             try {
-                return Double.parseDouble(scanner.nextLine().trim().replace(",", "."));
+                String input = scanner.nextLine().trim().replace(",", ".");
+                return new BigDecimal(input);
             } catch (NumberFormatException e) {
-                System.out.println(">> Ошибка: введите корректное число (например, 100.50).");
+                System.out.println(">> Ошибка: введите число (например, 100.50).");
             }
         }
     }
@@ -106,7 +105,7 @@ public class CommandProcessor {
             if (Currency.isValid(currencyCode)) {
                 return currencyCode;
             } else {
-                System.out.println(">> Ошибка: неверная валюта. Доступны только: RUB, USD, EUR.");
+                System.out.println(">> Ошибка! Доступны только: " + Arrays.toString(Currency.values()));
             }
         }
     }

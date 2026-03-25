@@ -15,13 +15,9 @@ public class ClientService {
     }
 
     @Transactional
-    public void deleteClientAndAccounts(Long clientId, boolean simulateError) {
+    public void deleteClientAndAccounts(Long clientId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Клиент не найден"));
-
-        if (simulateError) {
-            throw new RuntimeException("Имитация ошибки для отката транзакции");
-        }
 
         clientRepository.delete(client);
     }

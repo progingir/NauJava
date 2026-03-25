@@ -1,10 +1,11 @@
 package ru.valerii.NauJava;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import ru.valerii.NauJava.entity.*;
 import ru.valerii.NauJava.repository.*;
@@ -13,13 +14,16 @@ import ru.valerii.NauJava.service.ClientService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+
 @SpringBootTest
 @Transactional
-@TestPropertySource(locations = "classpath:application.yaml")
 class DatabaseTests {
 
-    @Autowired
+    @MockitoSpyBean
     private ClientRepository clientRepository;
+
     @Autowired
     private BankRepository bankRepository;
     @Autowired
@@ -28,6 +32,14 @@ class DatabaseTests {
     private FinancialTransactionRepository transactionRepository;
     @Autowired
     private ClientService clientService;
+
+    @AfterEach
+    void tearDown() {
+        transactionRepository.deleteAll();
+        accountRepository.deleteAll();
+        clientRepository.deleteAll();
+        bankRepository.deleteAll();
+    }
 
     @Test
     void testCustomQueriesAndCriteria() {
@@ -76,8 +88,11 @@ class DatabaseTests {
         clientRepository.save(client);
         Long clientId = client.getId();
 
+        doThrow(new RuntimeException("Имитация ошибки для проверки отката"))
+                .when(clientRepository).delete(any(Client.class));
+
         Assertions.assertThrows(RuntimeException.class, () -> {
-            clientService.deleteClientAndAccounts(clientId, true);
+            clientService.deleteClientAndAccounts(clientId);
         });
 
         Assertions.assertTrue(clientRepository.findById(clientId).isPresent());
@@ -91,7 +106,7 @@ class DatabaseTests {
         clientRepository.save(client);
         Long clientId = client.getId();
 
-        clientService.deleteClientAndAccounts(clientId, false);
+        clientService.deleteClientAndAccounts(clientId);
 
         Assertions.assertTrue(clientRepository.findById(clientId).isEmpty());
     }

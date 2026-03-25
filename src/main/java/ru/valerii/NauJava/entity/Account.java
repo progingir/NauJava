@@ -3,6 +3,7 @@ package ru.valerii.NauJava.entity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,7 +34,7 @@ public class Account {
     private Bank bank;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<FinancialTransaction> transactions;
+    private List<FinancialTransaction> transactions = new ArrayList<>();
 
     public Long getId() {
         return id;

@@ -2,6 +2,7 @@ package ru.valerii.NauJava.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,7 @@ public class Bank {
     private String contactPhone;
 
     @OneToMany(mappedBy = "bank", cascade = CascadeType.ALL)
-    private List<Account> accounts;
+    private List<Account> accounts = new ArrayList<>();
 
     public Long getId() {
         return id;

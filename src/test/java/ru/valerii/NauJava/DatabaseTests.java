@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import ru.valerii.NauJava.entity.*;
 import ru.valerii.NauJava.repository.*;
 import ru.valerii.NauJava.service.ClientService;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class DatabaseTests {
 
     @MockitoSpyBean
@@ -55,22 +58,22 @@ class DatabaseTests {
 
         Account acc = new Account();
         acc.setAccountNumber("12345");
-        acc.setBalance(5000.0);
+        acc.setBalance(new BigDecimal("5000.00"));
         acc.setCurrency("RUB");
         acc.setBank(bank);
         acc.setClient(client);
         accountRepository.save(acc);
 
         FinancialTransaction tx = new FinancialTransaction();
-        tx.setAmount(1000.0);
+        tx.setAmount(new BigDecimal("1000.0"));
         tx.setOperationDate(LocalDateTime.now());
         tx.setAccount(acc);
         transactionRepository.save(tx);
 
-        List<Account> accountsDataJpa = accountRepository.findByBalanceBetweenAndCurrency(1000.0, 6000.0, "RUB");
+        List<Account> accountsDataJpa = accountRepository.findByBalanceBetweenAndCurrency(new BigDecimal("1000.0"), new BigDecimal("6000.0"), "RUB");
         Assertions.assertEquals(1, accountsDataJpa.size());
 
-        List<Account> accountsCriteria = accountRepository.searchAccountsByCriteria(1000.0, 6000.0, "RUB");
+        List<Account> accountsCriteria = accountRepository.searchAccountsByCriteria(new BigDecimal("1000.0"), new BigDecimal("6000.0"), "RUB");
         Assertions.assertEquals(1, accountsCriteria.size());
 
         List<FinancialTransaction> txDataJpa = transactionRepository.findByClientEmail("ivan@test.com");

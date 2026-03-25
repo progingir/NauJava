@@ -3,11 +3,13 @@ package ru.valerii.NauJava.console;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import ru.valerii.NauJava.entity.CommandType;
 
 import java.util.Scanner;
 
 @Configuration
+@Profile("!test")
 public class ConsoleRunner {
 
     @Bean

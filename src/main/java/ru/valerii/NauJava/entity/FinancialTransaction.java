@@ -2,6 +2,7 @@ package ru.valerii.NauJava.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,7 +13,7 @@ public class FinancialTransaction {
     private Long id;
 
     @Column(nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
     @Column
     private String description;
@@ -39,11 +40,11 @@ public class FinancialTransaction {
         this.id = id;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

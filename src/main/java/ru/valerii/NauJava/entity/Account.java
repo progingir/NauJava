@@ -2,6 +2,7 @@ package ru.valerii.NauJava.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ public class Account {
     private String accountNumber;
 
     @Column(nullable = false)
-    private Double balance;
+    private BigDecimal balance;
 
     @Column(nullable = false)
     private String currency;
@@ -50,11 +51,11 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

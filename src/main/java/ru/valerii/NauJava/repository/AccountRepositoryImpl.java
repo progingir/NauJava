@@ -5,6 +5,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 import ru.valerii.NauJava.entity.Account;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -14,7 +16,7 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<Account> searchAccountsByCriteria(Double min, Double max, String currency) {
+    public List<Account> searchAccountsByCriteria(BigDecimal min, BigDecimal max, String currency) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Account> cq = cb.createQuery(Account.class);
         Root<Account> root = cq.from(Account.class);

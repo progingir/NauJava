@@ -1,4 +1,16 @@
 spring:
+  application:
+    name: NauJava_hw
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+
+app:
+  name: NauJava Transaction Manager
+  version: 1.0.0
   datasource:
     url: jdbc:postgresql://localhost:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}

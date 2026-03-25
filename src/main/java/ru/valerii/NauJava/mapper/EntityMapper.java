@@ -1,0 +1,38 @@
+package ru.valerii.NauJava.mapper;
+
+import org.springframework.stereotype.Component;
+import ru.valerii.NauJava.dto.AccountDto;
+import ru.valerii.NauJava.dto.TransactionDto;
+import ru.valerii.NauJava.entity.Account;
+import ru.valerii.NauJava.entity.FinancialTransaction;
+
+@Component
+public class EntityMapper {
+
+    public AccountDto toDto(Account account) {
+        if (account == null) return null;
+
+        AccountDto dto = new AccountDto();
+        dto.setId(account.getId());
+        dto.setAccountNumber(account.getAccountNumber());
+        dto.setBalance(account.getBalance());
+        dto.setCurrency(account.getCurrency());
+
+        if (account.getClient() != null) {
+            dto.setClientName(account.getClient().getFullName());
+        }
+        return dto;
+    }
+
+    public TransactionDto toDto(FinancialTransaction tx) {
+        if (tx == null) return null;
+
+        TransactionDto dto = new TransactionDto();
+        dto.setId(tx.getId());
+        dto.setAmount(tx.getAmount());
+        dto.setDescription(tx.getDescription());
+        dto.setOperationDate(tx.getOperationDate());
+        dto.setStatus(tx.getStatus());
+        return dto;
+    }
+}

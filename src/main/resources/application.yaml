@@ -2,11 +2,26 @@ spring:
   application:
     name: NauJava_hw
 
+  datasource:
+    url: jdbc:postgresql://localhost:${DB_PORT:5432}/${DB_NAME:postgres}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:12345}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+
 management:
   endpoints:
     web:
       exposure:
-        include: "health,info"
+        include: "health,info,metrics"
 
 app:
   name: NauJava Transaction Manager

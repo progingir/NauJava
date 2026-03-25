@@ -1,78 +1,87 @@
 package ru.valerii.NauJava.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.valerii.NauJava.entity.Account;
 import ru.valerii.NauJava.entity.Currency;
-import ru.valerii.NauJava.entity.Transaction;
+import ru.valerii.NauJava.entity.FinancialTransaction;
 import ru.valerii.NauJava.exception.TransactionNotFoundException;
 import ru.valerii.NauJava.exception.TransactionValidationException;
-import ru.valerii.NauJava.repository.CrudRepository;
+import ru.valerii.NauJava.repository.AccountRepository;
+import ru.valerii.NauJava.repository.FinancialTransactionRepository;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    private final CrudRepository<Transaction> repository;
+    private final FinancialTransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
 
-    public TransactionServiceImpl(CrudRepository<Transaction> repository) {
-        this.repository = repository;
+    public TransactionServiceImpl(FinancialTransactionRepository transactionRepository,
+                                  AccountRepository accountRepository) {
+        this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
     }
 
     @Override
-    public Long save(BigDecimal amount, String currencyCode, String description) {
-        validateTransactionData(amount, currencyCode);
+    @Transactional
+    public Long save(Long accountId, BigDecimal amount, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new TransactionValidationException("Сумма должна быть больше нуля");
+        }
 
-        Transaction t = new Transaction(null, amount, Currency.valueOf(currencyCode.toUpperCase()), description);
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new TransactionValidationException("Счет с ID " + accountId + " не найден"));
 
-        repository.create(t);
+        FinancialTransaction ft = new FinancialTransaction();
+        ft.setAmount(amount);
+        ft.setDescription(description);
+        ft.setAccount(account);
+        ft.setOperationDate(LocalDateTime.now());
+        ft.setStatus("COMPLETED");
 
-        return t.getId();
+        transactionRepository.save(ft);
+        return ft.getId();
     }
 
     @Override
-    public void update(Long id, BigDecimal amount, String currencyCode, String description) {
-        Transaction existing = repository.read(id)
-                .orElseThrow(() -> new TransactionNotFoundException("Транзакция с ID " + id + " не найдена."));
-
-        validateTransactionData(amount, currencyCode);
+    @Transactional
+    public void update(Long id, BigDecimal amount, String description) {
+        FinancialTransaction existing = transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException("Транзакция не найдена"));
 
         existing.setAmount(amount);
-        existing.setCurrency(Currency.valueOf(currencyCode.toUpperCase()));
         existing.setDescription(description);
-
-        repository.update(existing);
+        transactionRepository.save(existing);
     }
 
     @Override
-    public List<Transaction> getAll() {
-        return repository.readAll();
+    public List<FinancialTransaction> getAll() {
+        return transactionRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal calculateTotalAmount(String targetCurrencyCode) {
         Currency targetCurrency = Currency.valueOf(targetCurrencyCode.toUpperCase());
 
-        return repository.readAll().stream()
-                .map(t -> t.getCurrency().convertTo(targetCurrency, t.getAmount()))
+        return transactionRepository.findAll().stream()
+                .map(t -> {
+                    Currency sourceCurrency = Currency.valueOf(t.getAccount().getCurrency().toUpperCase());
+                    return sourceCurrency.convertTo(targetCurrency, t.getAmount());
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
+    @Transactional
     public void remove(Long id) {
-        repository.read(id)
-                .orElseThrow(() -> new TransactionNotFoundException("Транзакция с ID " + id + " не найдена."));
-
-        repository.delete(id);
-    }
-
-    private void validateTransactionData(BigDecimal amount, String currencyCode) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new TransactionValidationException("Сумма транзакции должна быть больше нуля.");
+        if (!transactionRepository.existsById(id)) {
+            throw new TransactionNotFoundException("Транзакция не найдена");
         }
-        if (!Currency.isValid(currencyCode)) {
-            throw new TransactionValidationException("Неверная валюта! Доступны: " + Arrays.toString(Currency.values()));
-        }
+        transactionRepository.deleteById(id);
     }
 }

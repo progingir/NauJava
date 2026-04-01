@@ -4,9 +4,11 @@ import org.springframework.stereotype.Component;
 import ru.valerii.NauJava.dto.AccountDto;
 import ru.valerii.NauJava.dto.ClientDto;
 import ru.valerii.NauJava.dto.TransactionDto;
+import ru.valerii.NauJava.dto.UserRegistrationDto;
 import ru.valerii.NauJava.entity.Account;
 import ru.valerii.NauJava.entity.Client;
 import ru.valerii.NauJava.entity.FinancialTransaction;
+import ru.valerii.NauJava.entity.User;
 
 @Component
 public class EntityMapper {
@@ -47,5 +49,14 @@ public class EntityMapper {
         dto.setEmail(client.getEmail());
         dto.setStatus(client.getStatus());
         return dto;
+    }
+
+    public User toEntity(UserRegistrationDto dto) {
+        if (dto == null) return null;
+
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        return user;
     }
 }

@@ -7,6 +7,10 @@
 </head>
 <body>
 <h1>Наши клиенты</h1>
+
+<form th:action="@{/logout}" method="post" style="margin-bottom: 20px;">
+    <input type="submit" value="Выйти из системы" style="padding: 8px 16px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;"/>
+</form>
 <table>
     <thead>
     <tr>

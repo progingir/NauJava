@@ -26,3 +26,8 @@ management:
 app:
   name: NauJava Transaction Manager
   version: 1.0.0
+
+admin:
+  default:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}

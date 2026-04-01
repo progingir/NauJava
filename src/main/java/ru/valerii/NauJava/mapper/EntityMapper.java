@@ -2,8 +2,10 @@ package ru.valerii.NauJava.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.valerii.NauJava.dto.AccountDto;
+import ru.valerii.NauJava.dto.ClientDto;
 import ru.valerii.NauJava.dto.TransactionDto;
 import ru.valerii.NauJava.entity.Account;
+import ru.valerii.NauJava.entity.Client;
 import ru.valerii.NauJava.entity.FinancialTransaction;
 
 @Component
@@ -33,6 +35,17 @@ public class EntityMapper {
         dto.setDescription(tx.getDescription());
         dto.setOperationDate(tx.getOperationDate());
         dto.setStatus(tx.getStatus());
+        return dto;
+    }
+
+    public ClientDto toDto(Client client) {
+        if (client == null) return null;
+
+        ClientDto dto = new ClientDto();
+        dto.setId(client.getId());
+        dto.setFullName(client.getFullName());
+        dto.setEmail(client.getEmail());
+        dto.setStatus(client.getStatus());
         return dto;
     }
 }

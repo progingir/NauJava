@@ -2,6 +2,9 @@ package ru.valerii.NauJava.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -12,6 +15,9 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String username;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
 
     @Column(nullable = false)
     private String password;
@@ -53,5 +59,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
     }
 }

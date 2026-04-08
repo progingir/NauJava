@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/registration", "/login", "/logout").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
+                        .requestMatchers("/reports/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

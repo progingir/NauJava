@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        .summary-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .footer { margin-top: 20px; font-weight: bold; color: #555; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+<h1>Отчет по состоянию системы</h1>
+
+<div class="summary-card">
+    <h4>Статистика по пользователям:</h4>
+    <p>Всего пользователей в системе: <span th:text="${userCount}">0</span></p>
+    <p><i>Затрачено времени на запрос: <span th:text="${userTime}">0</span> мс</i></p>
+</div>
+
+<h3>Список клиентов</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ФИО Клиента</th>
+        <th>Электронная почта</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.fullName}">Имя</td>
+        <td th:text="${client.email}">Email</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(clients)}">
+        <td colspan="2" style="text-align: center;">Данные о клиентах отсутствуют</td>
+    </tr>
+    </tbody>
+</table>
+<p><i>Затрачено времени на получение списка: <span th:text="${clientTime}">0</span> мс</i></p>
+
+<div class="footer">
+    <p>Общее время генерации: <span th:text="${totalTime}">0</span> мс</p>
+</div>
+</body>
+</html>

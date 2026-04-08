@@ -28,6 +28,6 @@ public class ClientViewController {
                 .collect(Collectors.toList());
 
         model.addAttribute("clients", clients);
-        return "client-list";
+        return "clients";
     }
 }

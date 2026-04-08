@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:${DB_PORT:5432}/${DB_NAME:postgres}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:12345}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -14,8 +14,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp.use_jdbc_metadata_defaults: false
     show-sql: true
+    open-in-view: false
 
+  data:
+    rest:
+      base-path: /api
+
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
 
 management:
   endpoints:
